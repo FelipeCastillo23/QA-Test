@@ -2,47 +2,56 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
-  Put,
   Param,
   Delete,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto, UpdatePostDto } from './dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { QueryParamsDto } from './dto/query.params.dto';
+import { CreatePostDto } from './dto/create-post.dto';
+import { GetUser } from 'src/common/decorators/user.decorator';
+import { User } from 'src/auth/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Post as Publish } from './entities/post.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UpdatePostDto } from './dto/update-post.dto';
 
-@UseGuards(AuthGuard)
-@Controller('api/posts')
+@Controller('post')
+@UseGuards(JwtAuthGuard)
+@ApiTags('Publicaciones')
+@ApiBearerAuth()
 export class PostsController {
-  constructor(
-    private readonly postsService: PostsService,
-  ) {}
-
-  @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.create(createPostDto);
-  }
+  constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  findAll(@Query() queryParams: QueryParamsDto, @Body() userId: string) {
-    return this.postsService.findAll(queryParams, userId);
+  findAll(): Promise<Publish[]> {
+    return this.postsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  findOne(@Param('id') id: string): Promise<Publish> {
+    return this.postsService.findOne(id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @Post()
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @GetUser() user: User,
+  ): Promise<Publish> {
+    return this.postsService.create(createPostDto, user);
+  }
+
+  @Patch(':id')
+  update(
+    @Body() updatePostDto: UpdatePostDto,
+    @Param('id') id: string,
+  ): Promise<Publish> {
+    return this.postsService.update(updatePostDto, id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  remove(@Param('id') id: string): Promise<Publish> {
+    return this.postsService.remove(id);
   }
 }
