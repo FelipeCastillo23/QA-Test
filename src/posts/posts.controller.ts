@@ -18,23 +18,25 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('post')
-@UseGuards(JwtAuthGuard)
 @ApiTags('Publicaciones')
 @ApiBearerAuth()
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(): Promise<Publish[]> {
     return this.postsService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string): Promise<Publish> {
     return this.postsService.findOne(id);
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(
     @Body() createPostDto: CreatePostDto,
     @GetUser() user: User,
@@ -51,6 +53,7 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string): Promise<Publish> {
     return this.postsService.remove(id);
   }

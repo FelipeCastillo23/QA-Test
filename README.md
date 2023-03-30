@@ -57,7 +57,7 @@ body:
     password: obligatorio, tamaño minimo 8, seguro, texto
     fullname: obligatorio, texto
 respuesta:
-    Objeto del suario creado con id, fecha de creación y fecha de actualización
+    Objeto del usuario creado con id, fecha de creación y fecha de actualización
 
 Descripción: Autentica un usuario
 POST /auth/login
